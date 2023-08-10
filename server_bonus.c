@@ -1,34 +1,29 @@
-#include <unistd.h>
-#include <signal.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   server_bonus.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mucakmak <mucakmak@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/10 00:44:39 by mucakmak          #+#    #+#             */
+/*   Updated: 2023/08/10 19:33:12 by mucakmak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-void ft_putchar(char c)
-{
-	write(1, &c, 1);
-}
+#include "minitalk_bonus.h"
 
-int	ft_putnbr(int nbr)
-{
-	if (nbr > 9)
-	{
-		ft_putnbr(nbr / 10);
-		nbr %= 10;
-	}
-	if (nbr < 9)
-		ft_putchar(nbr + '0');
-	
-	return (0);
-}
-
-void handler(int signal)
+void handler(int signal, siginfo_t *info, void *cnt)
 {
 	static int i = 0;
 	static char c = 0;
 
+	(void)cnt;
 	if (signal == SIGUSR1)
 		c |= 1 << i;
 	i++;
 	if (i == 8)
 	{
+		kill(info->si_pid, SIGUSR1);
 		ft_putchar(c);
 		i = 0;
 		c = 0;
@@ -37,19 +32,17 @@ void handler(int signal)
 
 int main()
 {
-	int pid;
+	pid_t pid;
 	struct sigaction sa;
 
-	sa.sa_handler = handler; // sinyal geldiğinde uygulanacak fonksiyon
+	sa.sa_sigaction = handler;
+	sa.sa_flags = 0;
 
-	if (sigaction(SIGUSR1, &sa, NULL) == -1)
-		write(1, "Sigaction Hatası!", 23);
-	if (sigaction(SIGUSR2, &sa, NULL) == -1)
-		write(1, "Sigaction Hatası!", 23);
+	if (sigaction(SIGUSR1, &sa, NULL) == -1 || sigaction(SIGUSR2, &sa, NULL) == -1)
+		ft_printf("Sigaction Hatası!\n");
 
 	pid = getpid();
-	ft_putnbr(pid);
-	write(1, "\n", 1);
+	ft_printf("PID: %d\n", pid);
 	while (1)
 	{
 		pause();

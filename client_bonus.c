@@ -1,5 +1,25 @@
-#include <unistd.h>
-#include <signal.h>
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   client_bonus.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: mucakmak <mucakmak@student.42istanbul.c    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/08/10 00:44:49 by mucakmak          #+#    #+#             */
+/*   Updated: 2023/08/10 19:33:11 by mucakmak         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minitalk_bonus.h"
+
+void reveiceSend(int signal)
+{
+	static int i = 0;
+
+	if ((signal == SIGUSR2 || signal == SIGUSR1) && i++ == 0)
+		ft_printf("Mesaj Gönderildi!\n");
+}
+
 
 int	ft_atoi(char *str)
 {
@@ -27,7 +47,9 @@ void sendBit(int pid, char c)
 			kill(pid, SIGUSR1);
 		else
 			kill(pid, SIGUSR2);
-		usleep(100);
+		signal(SIGUSR1, reveiceSend);
+		signal(SIGUSR2, reveiceSend);
+		usleep(50);
 		i++;
 	}
 }
@@ -35,25 +57,23 @@ void sendBit(int pid, char c)
 int main(int argc, char *argv[])
 {
 	int i;
-	int pid;
+	pid_t pid;
 
 	if (argc != 3)
 	{
-		write(1, "Hatalı argüman sayısı!\n", 28);
+		ft_printf("Hatalı argüman sayısı!\n");
 		return (1);
 	}
-	i = -1;
 	pid = ft_atoi(argv[1]);
 	if (pid <= 0)
 	{
-		write(1, "Geçersiz PID!\n", 14);
+		ft_printf("Geçersiz PID!");
 		return (1);
-	}		
-	while (argv[2][++i])
-	{
-		sendBit(pid, argv[2][i]);
-		write(1, "Gönderildi\n", 12);
 	}
+		
+	i = -1;
+	while (argv[2][++i])
+		sendBit(pid, argv[2][i]);
 	sendBit(pid, '\n');
 	return (0);
 }
