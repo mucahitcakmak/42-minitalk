@@ -6,16 +6,16 @@
 /*   By: mucakmak <mucakmak@student.42istanbul.c    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/10 01:27:44 by mucakmak          #+#    #+#             */
-/*   Updated: 2023/08/10 19:20:19 by mucakmak         ###   ########.fr       */
+/*   Updated: 2023/08/17 23:47:22 by mucakmak         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void handler(int signal)
+void	handler(int signal)
 {
-	static int i = 0;
-	static char c = 0;
+	static int	i = 0;
+	static char	c = 0;
 
 	if (signal == SIGUSR1)
 		c |= 1 << i;
@@ -28,23 +28,22 @@ void handler(int signal)
 	}
 }
 
-int main(int argc, char *argv[])
+int	main(int argc, char *argv[])
 {
-	pid_t pid;
-	struct sigaction sa;
+	pid_t				pid;
+	struct sigaction	sa;
 
 	sa.sa_handler = handler;
 	sa.sa_flags = 0;
-
 	(void)argv;
 	if (argc != 1)
 	{
-		ft_printf("Hatalı argüman!\n");
+		ft_printf("Incorrect argument!\n");
 		return (1);
 	}
-	if (sigaction(SIGUSR1, &sa, NULL) == -1 || sigaction(SIGUSR2, &sa, NULL) == -1)
-		ft_printf("Sigaction Hatası!\n");
-
+	if (sigaction(SIGUSR1, &sa, NULL) == -1 
+		|| sigaction(SIGUSR2, &sa, NULL) == -1)
+		ft_printf("Sigaction error!\n");
 	pid = getpid();
 	ft_printf("PID: %d\n", pid);
 	while (1)
